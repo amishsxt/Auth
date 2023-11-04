@@ -1,22 +1,33 @@
 package com.example.amishauthapp.Views.SplashScreen;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.amishauthapp.R;
 import com.example.amishauthapp.Views.Auth.SignInActivity;
 import com.example.amishauthapp.Views.LandingScreen.HomeActivity;
 import com.example.amishauthapp.databinding.ActivitySplashBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SplashActivity extends AppCompatActivity {
 
     private ActivitySplashBinding xml;
+    private static final String POST_NOTIFICATIONS_PERMISSION = "android.permission.POST_NOTIFICATIONS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +36,11 @@ public class SplashActivity extends AppCompatActivity {
         xml =ActivitySplashBinding.inflate(getLayoutInflater());
         setContentView(xml.getRoot());
 
+        askPermission();
+
         // Fade-in animation
         Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in);
-        fadeInAnimation.setDuration(800);
+        fadeInAnimation.setDuration(2000);
 
         fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -68,5 +81,17 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
+    }
+
+    public void askPermission(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            if(ContextCompat.checkSelfPermission(SplashActivity.this,
+                    Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED){
+
+                ActivityCompat.requestPermissions(SplashActivity.this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},101);
+            }
+        }
     }
 }

@@ -1,16 +1,21 @@
 package com.example.amishauthapp.Views.Auth;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.amishauthapp.Model.Callbacks.OnCompleteCallback;
 import com.example.amishauthapp.R;
@@ -21,9 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseUser;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -95,7 +98,7 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void hideProgressDialog(){
-        progressDialog.hide();
+        progressDialog.cancel();
     }
 
     @Override
@@ -114,6 +117,8 @@ public class SignInActivity extends AppCompatActivity {
                     loginUser(true);
                     hideProgressDialog();
 
+                    showNotification();
+
                     Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -125,6 +130,30 @@ public class SignInActivity extends AppCompatActivity {
                     Toast.makeText(SignInActivity.this, ex, Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+
+    private void showNotification(){
+        // Get the user's email address.
+        String userEmail = GoogleSignIn.getLastSignedInAccount(this).getEmail();
+
+        //notification
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        Log.d("off","1");
+        synchronized (nm) {
+            Notification welcomeNotification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.google_logo)
+                    .setContentText("Welcome " + userEmail + " !")
+                    .setSubText("User signed in!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .build();
+
+            Log.d("off","2");
+
+            nm.notify();
+
+            Log.d("off","3");
         }
     }
 
