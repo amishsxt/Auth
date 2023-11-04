@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "207895188119",
+    "project_id": "auth-7afbc",
+    "storage_bucket": "auth-7afbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207895188119:android:524a34aabc07e69cca0fd2",
+        "android_client_info": {
+          "package_name": "com.example.amishauthapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207895188119-e2klffcqkt0v9472cce13v2b7rniabjt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.amishauthapp",
+            "certificate_hash": "c9fd5f466c21b698c6d594664416cf5147720c86"
+          }
+        },
+        {
+          "client_id": "207895188119-mm5fd3p3jjvkbudhscvsftnngas0qoaq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBldX6wrUgybHUGbJvZA8ZaK3Cj1aKm0I0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207895188119-mm5fd3p3jjvkbudhscvsftnngas0qoaq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

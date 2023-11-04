@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Views.Auth.SignInActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign In Screen"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_22sdp"
+            android:fontFamily="@font/f_bold"
+            android:layout_gravity="center_horizontal"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="40dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/googleSignInBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/google_logo"
+                app:iconTint="@null"
+                android:text="Continue with Google"
+                android:paddingHorizontal="50dp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/white"
+                android:fontFamily="@font/f_bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginVertical="3dp">
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="0.5dp"
+                    android:background="@color/light_grey"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="or"
+                    android:textColor="@color/light_grey"
+                    android:textSize="@dimen/_8ssp"
+                    android:fontFamily="@font/f_regular"
+                    android:layout_marginHorizontal="10dp"/>
+
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="0.5dp"
+                    android:background="@color/light_grey"
+                    android:layout_weight="1"/>
+
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/facebookSignInBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/facebook_logo"
+                app:iconTint="@null"
+                android:text="Continue with Facebook"
+                android:paddingHorizontal="50dp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/white"
+                android:fontFamily="@font/f_bold"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
