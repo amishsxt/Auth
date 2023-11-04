@@ -41,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         //init
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         user = FirebaseAuth.getInstance();
-        xml.welcomeText.setText("Welcome " + user.getCurrentUser().getEmail());
+        xml.welcomeText.setText("Welcome\n" + user.getCurrentUser().getEmail());
         builder = new AlertDialog.Builder(this);
 
         xml.logoutBtn.setOnClickListener(new View.OnClickListener() {

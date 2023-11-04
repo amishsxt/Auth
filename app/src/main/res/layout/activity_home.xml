@@ -29,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Log out"
+            android:textColor="@color/white"
             android:backgroundTint="@color/black"
             app:strokeWidth="1dp"
             app:strokeColor="@color/white"

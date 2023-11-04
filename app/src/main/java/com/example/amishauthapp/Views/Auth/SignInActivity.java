@@ -122,7 +122,7 @@ public class SignInActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(String ex) {
                     hideProgressDialog();
-                    Toast.makeText(SignInActivity.this, ex.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignInActivity.this, ex, Toast.LENGTH_SHORT).show();
                 }
             });
         }
