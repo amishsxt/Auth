@@ -1,13 +1,10 @@
 package com.example.amishauthapp.Views.LandingScreen;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,7 +19,6 @@ import com.example.amishauthapp.databinding.ActivityHomeBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -30,7 +26,6 @@ public class HomeActivity extends AppCompatActivity {
     private AlertDialog.Builder builder;
 
     private AuthViewModel authViewModel;
-    private FirebaseAuth user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +36,8 @@ public class HomeActivity extends AppCompatActivity {
 
         //init
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        user = FirebaseAuth.getInstance();
-        xml.welcomeText.setText("Welcome\n" + user.getCurrentUser().getEmail());
         builder = new AlertDialog.Builder(this);
+        checkUserName();
 
         xml.logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,10 +56,19 @@ public class HomeActivity extends AppCompatActivity {
 
         // Set the login status
         editor.putBoolean("isLoggedIn", bool);
+        editor.putString("userName", "No UserName");
 
         // Apply the changes
         editor.apply();
+    }
 
+    private void checkUserName(){
+        // Get the SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+        // Retrieve the User Name
+        String name = sharedPreferences.getString("userName", "No UserName");
+        xml.userNameText.setText(name);
     }
 
     private void logoutDialogBox(){

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Amish Auth App</string>
+
+    <string name="facebook_app_id">697750492019247</string>
+    <string name="fb_login_protocol_scheme">fb697750492019247</string>
+    <string name="facebook_client_token">4a28c6ed28fa1c0c69be48e5f21ff815</string>
+
 </resources>

@@ -18,8 +18,18 @@
             android:id="@+id/welcomeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Home Screen"
+            android:text="Welcome"
             android:textColor="@color/white"
+            android:textSize="@dimen/_18ssp"
+            android:fontFamily="@font/f_medium"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/userNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="user name"
+            android:textColor="@color/sky_blue"
             android:textSize="@dimen/_22ssp"
             android:fontFamily="@font/f_medium"
             android:gravity="center"/>

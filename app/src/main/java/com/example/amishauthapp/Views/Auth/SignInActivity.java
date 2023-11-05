@@ -1,14 +1,14 @@
 package com.example.amishauthapp.Views.Auth;
 
-import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,20 +22,36 @@ import com.example.amishauthapp.R;
 import com.example.amishauthapp.ViewModel.AuthViewModel;
 import com.example.amishauthapp.Views.LandingScreen.HomeActivity;
 import com.example.amishauthapp.databinding.ActivitySignInBinding;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+
+import org.json.JSONObject;
+
+import java.util.Arrays;
 
 public class SignInActivity extends AppCompatActivity {
 
     private ActivitySignInBinding xml;
     private ProgressDialog progressDialog;
     private GoogleSignInClient mGoogleSignInClient;
-    private int RC_SIGN_IN = 40;
+    private static int RC_SIGN_IN = 40;
+    private static final String NOTIFICATION_CHANNEL_ID = "channel_id";
 
     private AuthViewModel authViewModel;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,21 +62,23 @@ public class SignInActivity extends AppCompatActivity {
 
         //init
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-
-        xml.googleSignInBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initGoogle();
-
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-            }
-        });
+        initGoogle();
+        initFacebook();
 
         xml.facebookSignInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Login with read permissions
+                LoginManager.getInstance().logInWithReadPermissions(SignInActivity.this, Arrays.asList("public_profile"));
+            }
+        });
 
+
+        xml.googleSignInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
     }
@@ -74,7 +92,63 @@ public class SignInActivity extends AppCompatActivity {
                         .build());
     }
 
-    private void loginUser(boolean bool){
+    private void initFacebook(){
+        // Initialize Facebook SDK with the App ID
+        FacebookSdk.setClientToken(getString(R.string.facebook_client_token));
+
+        callbackManager = CallbackManager.Factory.create();
+
+        // Initialize Facebook SDK
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
+        // Register the FacebookCallback
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // Handle the successful login
+
+                        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
+                        if (accessToken != null) {
+                            GraphRequest request = GraphRequest.newMeRequest(
+                                    accessToken,
+                                    new GraphRequest.GraphJSONObjectCallback() {
+                                        @Override
+                                        public void onCompleted(JSONObject object, GraphResponse response) {
+                                            String name = object.optString("name");
+
+                                            loginUser(true, name);
+
+                                            showLoginSuccessfulNotification("Facebook", name, 2);
+                                            navigate();
+                                        }
+                                    });
+
+                            Bundle parameters = new Bundle();
+                            parameters.putString("fields", "id,name,link,picture.type(large)");
+                            request.setParameters(parameters);
+                            request.executeAsync();
+                        }
+                        else{
+                            Toast.makeText(SignInActivity.this, "Facebook signin falied", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // Handle the canceled login
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // Handle the login error
+                    }
+                });
+    }
+
+    private void loginUser(boolean bool, String name){
         // Get the SharedPreferences instance
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
@@ -83,6 +157,7 @@ public class SignInActivity extends AppCompatActivity {
 
         // Set the login status
         editor.putBoolean("isLoggedIn", bool);
+        editor.putString("userName", name);
 
         // Apply the changes
         editor.apply();
@@ -114,14 +189,12 @@ public class SignInActivity extends AppCompatActivity {
             authViewModel.handleSignInResult(task, new OnCompleteCallback() {
                 @Override
                 public void onSuccess() {
-                    loginUser(true);
+                    String email = FirebaseAuth.getInstance().getCurrentUser().getEmail().toString();
+                    loginUser(true, email);
                     hideProgressDialog();
 
-                    showNotification();
-
-                    Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    showLoginSuccessfulNotification("Google", email, 1);
+                    navigate();
                 }
 
                 @Override
@@ -131,30 +204,54 @@ public class SignInActivity extends AppCompatActivity {
                 }
             });
         }
+
+        // Handle the Facebook callback
+        callbackManager.onActivityResult(requestCode, resultCode, data) ;
     }
 
-    private void showNotification(){
-        // Get the user's email address.
-        String userEmail = GoogleSignIn.getLastSignedInAccount(this).getEmail();
+    private void navigate(){
+        Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
-        //notification
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    private void showLoginSuccessfulNotification(String signinType, String name, int notificationId) {
+        // Create a notification channel (for Android 8 and above)
+        createNotificationChannel();
 
-        Log.d("off","1");
-        synchronized (nm) {
-            Notification welcomeNotification = new Notification.Builder(this)
-                    .setSmallIcon(R.drawable.google_logo)
-                    .setContentText("Welcome " + userEmail + " !")
-                    .setSubText("User signed in!")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .build();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.baseline_notifications_24)
+                .setContentTitle(signinType +" Login Successful")
+                .setContentText(name);
 
-            Log.d("off","2");
+        // Create an Intent for the notification to launch the home activity
+        Intent resultIntent = new Intent(this, HomeActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            nm.notify();
+        // Set the content intent for the notification
+        builder.setContentIntent(resultPendingIntent);
 
-            Log.d("off","3");
+        // Get an instance of the NotificationManager
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Notify using a unique ID to distinguish different notifications
+        notificationManager.notify(notificationId, builder.build());
+    }
+
+    private void createNotificationChannel() {
+        // Create the notification channel for Android 8 and above
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    "Login Notifications",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("Login notifications");
+            channel.enableLights(true);
+            channel.setLightColor(Color.BLUE);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
     }
-
 }

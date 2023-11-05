@@ -84,7 +84,7 @@
                 android:paddingHorizontal="50dp"
                 android:textColor="@color/black"
                 android:backgroundTint="@color/white"
-                android:fontFamily="@font/f_bold"/>
+                android:fontFamily="@font/f_bold" />
 
         </LinearLayout>
 
